@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { AppError } from "../lib/errors.js";
 
 declare global {
   namespace Express {
@@ -9,11 +10,13 @@ declare global {
   }
 }
 
-const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+const requireAuth = (req: Request, _res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized back of" });
+    return next(
+      new AppError("UNAUTHENTICATED", "Missing or malformed Authorization header"),
+    );
   }
   try {
     const token = authHeader.slice(7);
@@ -24,11 +27,8 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     req.userId = payload.id;
     next();
   } catch (err) {
-    return res
-      .status(401)
-      .json({ error: "Unauthorized invalid or expired token" });
+    return next(new AppError("UNAUTHENTICATED", "Invalid or expired token"));
   }
-  // next();
 };
 
 export default requireAuth;

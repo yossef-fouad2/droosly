@@ -1,28 +1,55 @@
 import type { Request, Response, NextFunction } from "express";
+import { ZodError } from "zod";
 import { logger } from "../lib/logger.js";
-import { ErrorBody } from "../lib/errors.js";
+import { AppError, toErrorBody, type ErrorBody } from "../lib/errors.js";
 
+/**
+ * The single funnel for every failure path. Register LAST, after all routes
+ * and middleware: `app.use(errorHandler)`. Nothing else writes an error
+ * response by hand — a failure `throw`s (routes; Express 5 catches async
+ * throws) or calls `next(err)` (middleware), and this is the only place an
+ * `ErrorBody` is ever serialized.
+ */
 export function errorHandler(
-  err: Error,
+  err: unknown,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response<ErrorBody>,
+  _next: NextFunction,
 ) {
-  logger.error({ err, method: req.method, url: req.url }, "Unhandled error occurred in request pipeline");
+  // 1. Expected, classified failures carry their own status/code/message.
+  if (err instanceof AppError) {
+    if (err.status >= 500) {
+      logger.error({ err, method: req.method, url: req.url }, err.message);
+    } else {
+      logger.debug({ code: err.code, method: req.method, url: req.url }, err.message);
+    }
+    res.status(err.status).json(toErrorBody(err.code, err.message, err.details));
+    return;
+  }
 
+  // 2. A Zod error that reached here unwrapped is a validation failure.
+  if (err instanceof ZodError) {
+    const details: Record<string, string[]> = {};
+    for (const issue of err.issues) {
+      const key = issue.path.join(".") || "_root";
+      (details[key] ??= []).push(issue.message);
+    }
+    res
+      .status(400)
+      .json(toErrorBody("VALIDATION_FAILED", "Validation failed", details));
+    return;
+  }
 
-  
-
-  // In production, don't leak full error messages to client
-  const message = process.env.NODE_ENV === "production"
-    ? "Internal Server Error"
-    : err.message || "Unknown error";
-
-   res.status(500).json({ error: message });
+  // 3. Anything else is unexpected: log it, and never leak internals in prod.
+  logger.error(
+    { err, method: req.method, url: req.url },
+    "Unhandled error in request pipeline",
+  );
+  const message =
+    process.env.NODE_ENV === "production"
+      ? "Internal Server Error"
+      : err instanceof Error && err.message
+        ? err.message
+        : "Unknown error";
+  res.status(500).json(toErrorBody("INTERNAL", message));
 }
-//  have to make error response shape consistent
-//  gotta make sure to add this middleware to the end of
-//  the middleware stack in your Express app,
-//  after all other routes and middleware have been defined.
-//  This ensures that any unhandled errors
-//  are caught and processed by this error handler.

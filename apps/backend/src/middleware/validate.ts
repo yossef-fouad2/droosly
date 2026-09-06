@@ -1,13 +1,14 @@
 import type { Request, Response, NextFunction } from "express";
 import type { ZodType } from "zod";
+import { AppError } from "../lib/errors.js";
 
 /**
  * Express middleware that validates req[source] against a Zod schema.
  * On success: replaces req[source] with the parsed (coerced + defaulted) data and calls next().
- * On failure: returns 400 with structured field-level errors.
+ * On failure: hands an AppError to the error funnel (single response shape).
  */
 export function validate(schema: ZodType, source: "body" | "query" | "params" = "body") {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const result = schema.safeParse(req[source]);
 
     if (!result.success) {
@@ -18,13 +19,10 @@ export function validate(schema: ZodType, source: "body" | "query" | "params" = 
         (fieldErrors[key] ??= []).push(issue.message);
       }
 
-      res.status(400).json({
-        error: "Validation failed",
-        details: fieldErrors,
-      });
+      next(new AppError("VALIDATION_FAILED", "Validation failed", fieldErrors));
       return;
     }
-    
+
     req.validated = result.data;
     next();
   };
