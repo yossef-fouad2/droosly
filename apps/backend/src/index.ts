@@ -5,6 +5,7 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
+
 import "dotenv/config";
 import express from "express";
 import authRouter from "./routes/auth.js";
@@ -16,7 +17,6 @@ import coursesRouter from "./routes/courses.js";
 import { connectDatabase } from "./db/index.js";
 
 const app = express();
-
 app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,21 +25,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRouter);
 app.use("/users", requireAuth, userRouter);
 app.use("/courses", coursesRouter);
-
 app.get("/", (req, res) => {
   res.send("Welcome to the system!");
 });
 
 // Error handler must be defined last
 app.use(errorHandler);
-
 try {
   await connectDatabase();
 } catch (err) {
   logger.fatal(err, "failed to connect to the database");
   process.exit(1);
 }
-
 app.listen(8000, () => {
   logger.info("server is running on port 8000");
 });

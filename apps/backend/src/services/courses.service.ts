@@ -1,6 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { courses } from "../db/schema.js";
+import { courses, type Course, type NewCourse } from "../db/schema.js";
 import { courseIdSchema } from "../validation/schemas.js";
 
 
@@ -55,14 +55,6 @@ export async function listCourses({ page, limit, category }: ListCoursesInput) {
 
 
 
-export type CourseSchema = {
-    id: number;
-    title: string;
-    description: string;
-    category: string;
-    price: number;
-    instructorId: number;
-};
 export async function  getCoursesByID(id: number){
   const course = await db
   .select({
@@ -78,4 +70,8 @@ export async function  getCoursesByID(id: number){
     .limit(1)
 
     return course[0];
+}
+
+export async function createCourse(){
+  
 }

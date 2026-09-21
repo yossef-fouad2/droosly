@@ -16,7 +16,7 @@ coursesRouter.get("/",
         return res.status(200).json(result);
 });
 
-coursesRouter.get("/:Id",
+coursesRouter.get("/:id",
     validate(courseIdSchema, "params"),
     async (req: Request, res: Response) =>{
         const result = await getCoursesByID((req.validated as { id: number }).id);

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { createCourse } from "../services/courses.service.js";
 
 // --- Auth ---
 export const signupSchema = z.object({
@@ -69,7 +70,14 @@ export const courseIdSchema = z.object({
 //     category: z.string().min(1,"course category"),
 //     price: z.number().positive("Price must be positive"),
 //     instructorId: z.number().int().positive(),
-})
+});
+export const createCourseSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200),
+  description: z.string().trim().min(1, "Description is required"),
+  category: z.string().trim().min(1).default("general"),
+  price: z.coerce.number().int().nonnegative("Price must be non-negative"),
+  // instructorId intentionally omitted — derived from the authenticated user
+});
 
 // --- Inferred TypeScript types ---
 export type SignupInput = z.infer<typeof signupSchema>;
