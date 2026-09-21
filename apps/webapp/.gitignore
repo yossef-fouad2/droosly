@@ -1,0 +1,12 @@
+# Accidental package created in the webapp parent directory
+/package.json
+/package-lock.json
+
+# Dependencies and local configuration
+node_modules/
+.env*
+
+# Logs and local OS files
+*.log
+.DS_Store
+Thumbs.db
