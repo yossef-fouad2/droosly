@@ -9,10 +9,7 @@ export default coursesRouter;
 coursesRouter.get("/",
     validate(listCoursesQuerySchema, "query"),
     async (req: Request, res: Response) => {
-        const result = await listCourses(req.validated as ListCoursesQueryInput);
-        if(!result){
-            
-        }
+        const result = await listCourses(req.validated as ListCoursesQueryInput);      
         return res.status(200).json(result);
 });
 

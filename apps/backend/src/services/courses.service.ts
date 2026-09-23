@@ -1,10 +1,23 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { courses, type Course, type NewCourse } from "../db/schema.js";
-import { courseIdSchema } from "../validation/schemas.js";
+import { AppError } from "../lib/errors.js";
+import type { CreateCourseInput } from "../validation/schemas.js";
 
 
 await db;
+
+
+
+// to avoid duplication of course columns
+const courseColumns = {
+  id: courses.id,
+  title: courses.title,
+  description: courses.description,
+  category: courses.id,
+  price: courses.price,
+  instructorId: courses.instructorId,
+};
 
 export type ListCoursesInput = {
   page: number;
@@ -18,14 +31,7 @@ export async function listCourses({ page, limit, category }: ListCoursesInput) {
   const whereClause = category ? eq(courses.category, category) : undefined;
 
   const items = await db
-    .select({
-      id: courses.id,
-      title: courses.title,
-      description: courses.description,
-      category: courses.category,
-      price: courses.price,
-      instructorId: courses.instructorId,
-    })
+    .select(courseColumns)
     .from(courses)
     .where(whereClause)
     .orderBy(desc(courses.id))
@@ -55,23 +61,35 @@ export async function listCourses({ page, limit, category }: ListCoursesInput) {
 
 
 
+//get single course by id
 export async function  getCoursesByID(id: number){
-  const course = await db
-  .select({
-      id: courses.id,
-      title: courses.title,
-      description: courses.description,
-      category: courses.category,
-      price: courses.price,
-      instructorId: courses.instructorId,
-    })
+  const [course] = await db
+  .select(courseColumns)
     .from(courses)
     .where(eq(courses.id, id))
-    .limit(1)
+    .limit(1);
 
-    return course[0];
+    if(!course){
+      throw new AppError("NOT_FOUND",'Course with id ${id} not found')
+    }
+    return course;
 }
 
-export async function createCourse(){
-  
+
+
+export async function createCourse(
+  input: CreateCourseInput,
+  instructorId: number,
+) {
+  const newCourse: NewCourse = {
+    title: input.title,
+    description: input.description,
+    category: input.category,
+    price: input.price,
+    instructorId,
+  };
+
+  const [course] = await db.insert(courses).values(newCourse).returning();
+
+  return course;
 }

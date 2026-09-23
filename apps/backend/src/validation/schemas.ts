@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { createCourse } from "../services/courses.service.js";
 
 // --- Auth ---
 export const signupSchema = z.object({
@@ -65,11 +64,6 @@ export const listCoursesQuerySchema = z.object({
 
 export const courseIdSchema = z.object({
     id: z.coerce.number().int().positive(),
-//     title: z.string().min(1,"course title"),
-//     description: z.string().min(1,"course description"),
-//     category: z.string().min(1,"course category"),
-//     price: z.number().positive("Price must be positive"),
-//     instructorId: z.number().int().positive(),
 });
 export const createCourseSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(200),
@@ -85,5 +79,6 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type CreateDrugInput = z.infer<typeof createDrugSchema>;
 export type CreateInventoryInput = z.infer<typeof createInventorySchema>;
 export type CreateSaleInput = z.infer<typeof createSaleSchema>;
+export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type ListCoursesQueryInput = z.infer<typeof listCoursesQuerySchema>;
 export type courseSchemainput = z.infer<typeof courseIdSchema>;
