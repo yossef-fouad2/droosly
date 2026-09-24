@@ -2,10 +2,9 @@ import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { courses, type Course, type NewCourse } from "../db/schema.js";
 import { AppError } from "../lib/errors.js";
-import type { CreateCourseInput } from "../validation/schemas.js";
+import type { CreateCourseInput,  } from "../validation/schemas.js";
 
 
-await db;
 
 
 
@@ -14,7 +13,7 @@ const courseColumns = {
   id: courses.id,
   title: courses.title,
   description: courses.description,
-  category: courses.id,
+  category: courses.category,
   price: courses.price,
   instructorId: courses.instructorId,
 };
@@ -70,7 +69,7 @@ export async function  getCoursesByID(id: number){
     .limit(1);
 
     if(!course){
-      throw new AppError("NOT_FOUND",'Course with id ${id} not found')
+      throw new AppError("NOT_FOUND","Course with id ${id} not found")
     }
     return course;
 }
@@ -80,7 +79,7 @@ export async function  getCoursesByID(id: number){
 export async function createCourse(
   input: CreateCourseInput,
   instructorId: number,
-) {
+ ) {
   const newCourse: NewCourse = {
     title: input.title,
     description: input.description,

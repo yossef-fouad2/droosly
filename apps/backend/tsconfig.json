@@ -38,6 +38,9 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
+   "ts-node": {
+    "files": true          // load ambient .d.ts files (src/types/express.d.ts) at runtime
+  },
   "include": [
     "src/**/*"
   ],

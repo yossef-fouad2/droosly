@@ -1,7 +1,9 @@
 import { Router, type Request, type Response } from "express";
-import { getCoursesByID, listCourses } from "../services/courses.service.js";
-import { listCoursesQuerySchema ,type ListCoursesQueryInput, type courseSchemainput, courseIdSchema } from "../validation/schemas.js";
+import { createCourse, getCoursesByID, listCourses } from "../services/courses.service.js";
+import { listCoursesQuerySchema ,type ListCoursesQueryInput, type courseSchemainput, courseIdSchema, createCourseSchema, type CreateCourseInput } from "../validation/schemas.js";
 import { validate } from "../middleware/validate.js";
+import requireAuth from "../middleware/requireAuth.js";
+import { AppError } from "../lib/errors.js";
 
 const coursesRouter = Router();
 export default coursesRouter;
@@ -23,5 +25,17 @@ coursesRouter.get("/:id",
         return res.status(200).json(result);
         
 });
+coursesRouter.post("/",
+    requireAuth,
+    validate(createCourseSchema, "body"),
+    async (req: Request, res: Response) => {
+        if (req.userId === undefined) {
+            throw new AppError("UNAUTHENTICATED", "Missing user id");
+        }
+        const input = req.validated as CreateCourseInput;
+        const course = await createCourse(input, req.userId);
+        return res.status(201).json(course);
+    }
+)
 
 //throw exception on fails for the api calls
