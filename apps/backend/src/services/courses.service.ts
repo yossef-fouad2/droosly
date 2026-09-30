@@ -2,7 +2,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { courses, type Course, type NewCourse } from "../db/schema.js";
 import { AppError } from "../lib/errors.js";
-import type { CreateCourseInput,  } from "../validation/schemas.js";
+import type { CreateCourseInput, UpdateCourseInput,  } from "../validation/schemas.js";
 
 
 
@@ -91,4 +91,23 @@ export async function createCourse(
   const [course] = await db.insert(courses).values(newCourse).returning();
 
   return course;
+}
+
+export async function  updateCourse(
+  id:number,
+  instructorId: number,
+  input: UpdateCourseInput ) {
+   const existing = await getCoursesByID(id);
+   if(existing.instructorId === instructorId){
+    throw new AppError("FORBIDDEN",`course ${id} belongs to another teacher`);
+   }
+   const [course] = await db
+   .update(courses)
+   .set(input)
+   .from(courses)
+   .where(eq(courses.id, id))
+   .returning(courseColumns);
+
+  return course;
+   
 }

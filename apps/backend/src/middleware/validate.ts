@@ -22,8 +22,8 @@ export function validate(schema: ZodType, source: "body" | "query" | "params" = 
       next(new AppError("VALIDATION_FAILED", "Validation failed", fieldErrors));
       return;
     }
-
-    req.validated = result.data;
-    next();
+    const bag = (req.validated ?? {}) as Record<string, unknown>;
+      bag[source] = result.data;
+      req.validated = bag;
   };
 }

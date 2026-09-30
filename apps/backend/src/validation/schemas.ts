@@ -73,6 +73,7 @@ export const createCourseSchema = z.object({
   // instructorId intentionally omitted — derived from the authenticated user
 });
 
+export const updateCourseSchema = createCourseSchema.partial();
 // --- Inferred TypeScript types ---
 export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -80,5 +81,6 @@ export type CreateDrugInput = z.infer<typeof createDrugSchema>;
 export type CreateInventoryInput = z.infer<typeof createInventorySchema>;
 export type CreateSaleInput = z.infer<typeof createSaleSchema>;
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
+export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type ListCoursesQueryInput = z.infer<typeof listCoursesQuerySchema>;
 export type courseSchemainput = z.infer<typeof courseIdSchema>;

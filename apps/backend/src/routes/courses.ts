@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
-import { createCourse, getCoursesByID, listCourses } from "../services/courses.service.js";
-import { listCoursesQuerySchema ,type ListCoursesQueryInput, type courseSchemainput, courseIdSchema, createCourseSchema, type CreateCourseInput } from "../validation/schemas.js";
+import { createCourse, getCoursesByID, listCourses, updateCourse } from "../services/courses.service.js";
+import { courseIdSchema, listCoursesQuerySchema ,type ListCoursesQueryInput, createCourseSchema, type CreateCourseInput, updateCourseSchema, type UpdateCourseInput } from "../validation/schemas.js";
 import { validate } from "../middleware/validate.js";
 import requireAuth from "../middleware/requireAuth.js";
 import { AppError } from "../lib/errors.js";
@@ -35,6 +35,21 @@ coursesRouter.post("/",
         const input = req.validated as CreateCourseInput;
         const course = await createCourse(input, req.userId);
         return res.status(201).json(course);
+    }
+)
+coursesRouter.patch("/:id",
+    requireAuth,
+    validate(courseIdSchema,"params"),
+    validate(updateCourseSchema, "body"),
+    async(req: Request, res: Response) =>{
+        if(req.userId === undefined){
+            throw new AppError("UNAUTHENTICATED", "Missing user id");
+        }
+        const {id} = req.validated!.params as {id: number}
+        const input = req.validated!.body as UpdateCourseInput;
+        const instructorId = req.userId;
+        const course = await updateCourse(id,instructorId,input)
+        return res.status(200).json(course);
     }
 )
 
