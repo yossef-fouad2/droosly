@@ -69,7 +69,7 @@ export async function  getCoursesByID(id: number){
     .limit(1);
 
     if(!course){
-      throw new AppError("NOT_FOUND","Course with id ${id} not found")
+      throw new AppError("NOT_FOUND",`Course with id ${id} not found`)
     }
     return course;
 }
