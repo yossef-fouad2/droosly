@@ -25,5 +25,6 @@ export function validate(schema: ZodType, source: "body" | "query" | "params" = 
     const bag = (req.validated ?? {}) as Record<string, unknown>;
       bag[source] = result.data;
       req.validated = bag;
-  };
+      next();
+    };
 }

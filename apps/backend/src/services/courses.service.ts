@@ -98,7 +98,7 @@ export async function  updateCourse(
   instructorId: number,
   input: UpdateCourseInput ) {
    const existing = await getCoursesByID(id);
-   if(existing.instructorId === instructorId){
+   if(existing.instructorId !== instructorId){
     throw new AppError("FORBIDDEN",`course ${id} belongs to another teacher`);
    }
    const [course] = await db
@@ -107,6 +107,28 @@ export async function  updateCourse(
    .from(courses)
    .where(eq(courses.id, id))
    .returning(courseColumns);
+
+  return course;
+   
+}
+
+
+export async function deleteCourse(
+  id:number,
+  instructorId: number,
+  ) {
+   const existing = await getCoursesByID(id);
+   if(!existing){
+      throw new AppError("FORBIDDEN",`course ${id} Not found`);
+   }
+   if(existing.instructorId !== instructorId){
+    throw new AppError("FORBIDDEN",`course ${id} belongs to another teacher`);
+   }
+   const [course] = await db
+   .delete(courses)
+   .where(eq(courses.id, id))
+   .returning(courseColumns);
+
 
   return course;
    
