@@ -120,7 +120,7 @@ export async function deleteCourse(
    const existing = await getCoursesByID(id);
    if(!existing){
       throw new AppError("FORBIDDEN",`course ${id} Not found`);
-   }
+   }   
    if(existing.instructorId !== instructorId){
     throw new AppError("FORBIDDEN",`course ${id} belongs to another teacher`);
    }
@@ -128,7 +128,6 @@ export async function deleteCourse(
    .delete(courses)
    .where(eq(courses.id, id))
    .returning(courseColumns);
-
 
   return course;
    
