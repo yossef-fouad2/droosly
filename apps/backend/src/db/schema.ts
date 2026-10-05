@@ -37,6 +37,24 @@ export const categories = pgTable("categories",{
   slug: text("slug").notNull().unique(),
 });
 
+export const gradeLevels = pgTable("grade_levels",{
+  id: serial("id").primaryKey(),
+  nameEn: text("name_en").notNull(),
+  nameAr: text("name_ar").notNull(),
+  slug: text("slug").notNull().unique(),
+  order: integer("sort_order").notNull(),
+});
+
+export const terms = pgTable("terms",{
+  id: serial().primaryKey(),
+  nameEn: text("name_en").notNull(),
+  nameAr: text("name_ar").notNull(),
+  slug: text("slug").notNull().unique(),
+  order: integer("sort_order").notNull(),
+});
+
+
+
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
   courseId: integer("course_id")
@@ -130,3 +148,7 @@ export type WatchProgress = typeof watchProgress.$inferSelect;
 export type NewWatchProgress = typeof watchProgress.$inferInsert;
 export type Device = typeof devices.$inferSelect;
 export type NewDevice = typeof devices.$inferInsert;
+export type GradeLevel = typeof gradeLevels.$inferSelect;
+export type NewGradeLevel = typeof gradeLevels.$inferInsert;
+export type Term = typeof terms.$inferSelect;
+export type NewTerm = typeof terms.$inferInsert;

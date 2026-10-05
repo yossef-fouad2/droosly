@@ -13,7 +13,7 @@ const courseColumns = {
   id: courses.id,
   title: courses.title,
   description: courses.description,
-  category: courses.category,
+  categoryId: courses.categoryId,
   price: courses.price,
   instructorId: courses.instructorId,
 };
@@ -21,13 +21,13 @@ const courseColumns = {
 export type ListCoursesInput = {
   page: number;
   limit: number;
-  category?: string | undefined;
+  categoryId?: number | undefined;
 };
 
-export async function listCourses({ page, limit, category }: ListCoursesInput) {
+export async function listCourses({ page, limit, categoryId }: ListCoursesInput) {
   const offset = (page - 1) * limit;
 
-  const whereClause = category ? eq(courses.category, category) : undefined;
+  const whereClause = categoryId ? eq(courses.categoryId, categoryId) : undefined;
 
   const items = await db
     .select(courseColumns)
@@ -83,7 +83,7 @@ export async function createCourse(
   const newCourse: NewCourse = {
     title: input.title,
     description: input.description,
-    category: input.category,
+    categoryId: input.categoryId,
     price: input.price,
     instructorId,
   };
