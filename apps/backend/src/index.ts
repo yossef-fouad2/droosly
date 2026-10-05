@@ -1,13 +1,16 @@
 import { logger } from "./lib/logger.js";
+import "dotenv/config";
+import { connectDatabase } from "./db/index.js";
+import { createApp } from "./app.js";
+
 
 process.on("uncaughtException", (err) => {
   logger.fatal(err, "CRITICAL UNCAUGHT ERROR at startup");
   process.exit(1);
 });
 
-import "dotenv/config";
-import { connectDatabase } from "./db/index.js";
-import { createApp } from "./app.js";
+
+
 const port = Number(process.env.PORT) || 8000;
 const app = createApp();
 try {
@@ -17,5 +20,5 @@ try {
   process.exit(1);
 }
 app.listen(port, () => {
-  logger.info("server is running on port 8000");
+  logger.info(`server is running on port ${port}`);
 });

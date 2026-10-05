@@ -30,6 +30,12 @@ export const courses = pgTable("courses", {
   deletedAt: timestamp("deleted_at").defaultNow().notNull(),
 });
 
+export const categories = pgTable("Categories",{
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+});
+
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
   courseId: integer("course_id")
