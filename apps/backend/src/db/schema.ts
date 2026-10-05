@@ -22,7 +22,7 @@ export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  category: text("category").notNull().default("general"),
+  categoryId: integer("category_id").references(() => categories.id).notNull(),
   price: integer("price").notNull(),
   instructorId: integer("instructor_id")
   .references(() => users.id)
@@ -30,9 +30,10 @@ export const courses = pgTable("courses", {
   deletedAt: timestamp("deleted_at").defaultNow().notNull(),
 });
 
-export const categories = pgTable("Categories",{
+export const categories = pgTable("categories",{
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  nameEn: text("name_en").notNull(),
+  nameAr: text("name_ar").notNull(),
   slug: text("slug").notNull().unique(),
 });
 

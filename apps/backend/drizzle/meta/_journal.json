@@ -36,6 +36,34 @@
       "when": 1787703807266,
       "tag": "0004_oval_black_crow",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791195871770,
+      "tag": "0005_safe_midnight",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791196248624,
+      "tag": "0006_careless_gressill",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791198491526,
+      "tag": "0007_dark_blonde_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791200797088,
+      "tag": "0008_faithful_fabian_cortez",
+      "breakpoints": true
     }
   ]
 }
