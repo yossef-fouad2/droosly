@@ -1,6 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { courses, type Course, type NewCourse } from "../db/schema.js";
+import { courses,  type NewCourse } from "../db/schema.js";
 import { AppError } from "../lib/errors.js";
 import type { CreateCourseInput, UpdateCourseInput,  } from "../validation/schemas.js";
 
@@ -15,7 +15,7 @@ const courseColumns = {
   description: courses.description,
   categoryId: courses.categoryId,
   price: courses.price,
-  instructorId: courses.instructorId,
+  workspaceId: courses.workspaceId,
 };
 
 export type ListCoursesInput = {
@@ -78,14 +78,14 @@ export async function  getCoursesByID(id: number){
 
 export async function createCourse(
   input: CreateCourseInput,
-  instructorId: number,
+  workspaceId: number,
  ) {
   const newCourse: NewCourse = {
     title: input.title,
     description: input.description,
     categoryId: input.categoryId,
     price: input.price,
-    instructorId,
+    workspaceId,
   };
 
   const [course] = await db.insert(courses).values(newCourse).returning();
@@ -95,16 +95,15 @@ export async function createCourse(
 
 export async function  updateCourse(
   id:number,
-  instructorId: number,
+  workspaceId: number,
   input: UpdateCourseInput ) {
    const existing = await getCoursesByID(id);
-   if(existing.instructorId !== instructorId){
+   if(existing.workspaceId !== workspaceId){
     throw new AppError("FORBIDDEN",`course ${id} belongs to another teacher`);
    }
    const [course] = await db
    .update(courses)
    .set(input)
-   .from(courses)
    .where(eq(courses.id, id))
    .returning(courseColumns);
 
@@ -115,13 +114,13 @@ export async function  updateCourse(
 
 export async function deleteCourse(
   id:number,
-  instructorId: number,
+  workspaceId: number,
   ) {
    const existing = await getCoursesByID(id);
    if(!existing){
       throw new AppError("FORBIDDEN",`course ${id} Not found`);
    }   
-   if(existing.instructorId !== instructorId){
+   if(existing.workspaceId !== workspaceId){
     throw new AppError("FORBIDDEN",`course ${id} belongs to another teacher`);
    }
    const [course] = await db

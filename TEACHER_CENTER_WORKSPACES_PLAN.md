@@ -160,7 +160,7 @@ Paths beginning `src/` or `drizzle/` above are relative to `apps/backend`.
 
 **Outcome:** reliable course CRUD and a stable reference catalog before adding business membership.
 
-- [ ] Add global `categories` and `courses.categoryId`. Build an explicit legacy-string-to-category mapping, handle normalized slug collisions without silently merging different subjects, backfill, and validate before dropping free-text `category`.
+- [ X ] Add global `categories` and `courses.categoryId`. Build an explicit legacy-string-to-category mapping, handle normalized slug collisions without silently merging different subjects, backfill, and validate before dropping free-text `category`.
 - [ ] Seed the approved small category list and expose `GET /categories`. Do not add teacher-editable global categories or an admin CRUD subsystem.
 - [ ] Make `deletedAt` nullable without a default. Restore only rows confirmed to have an automatically populated, non-deletion timestamp; preserve evidence and resolve ambiguous rows before enabling archive filters.
 - [ ] Fix list/detail/create validation reads, replace the broken PATCH update chain, and remove DELETE body validation.

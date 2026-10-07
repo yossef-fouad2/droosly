@@ -18,14 +18,25 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const workspaces = pgTable("workspaces", {
+  id: serial("id").primaryKey(),
+  ownerId: integer("owner_id")
+    .references(() => users.id)
+    .notNull(),
+  nameEn: text("name_en").notNull(),
+  nameAr: text("name_ar").notNull(),
+  slug: text("slug").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   categoryId: integer("category_id").references(() => categories.id).notNull(),
   price: integer("price").notNull(),
-  instructorId: integer("instructor_id")
-  .references(() => users.id)
+  workspaceId: integer("workspace_id")
+  .references(() => workspaces.id)
   .notNull(),
   deletedAt: timestamp("deleted_at").defaultNow().notNull(),
 });
@@ -136,6 +147,8 @@ export const devices = pgTable("devices", {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Workspace = typeof workspaces.$inferSelect;
+export type NewWorkspace = typeof workspaces.$inferInsert;
 export type Course = typeof courses.$inferSelect;
 export type NewCourse = typeof courses.$inferInsert;
 export type Lesson = typeof lessons.$inferSelect;
