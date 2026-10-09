@@ -4,25 +4,25 @@ import authRouter from "./routes/auth.js";
 import userRouter from "./routes/users.js";
 import coursesRouter from "./routes/courses.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import categoriesRouter from "./routes/categories.js";
 
+export function createApp() {
+  const app = express();
+  // app.use(requestLogger);
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-export function createApp(){
-    const app = express();
-    // app.use(requestLogger);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+  // my features
+  app.use("/auth", authRouter);
+  app.use("/users", requireAuth, userRouter);
+  app.use("/categories", categoriesRouter);
+  app.use("/courses", coursesRouter);
+  app.get("/", (req, res) => {
+    res.send("Welcome to the system!");
+  });
 
-// my features
-app.use("/auth", authRouter);
-app.use("/users", requireAuth, userRouter);
-app.use("/courses", coursesRouter);
-app.get("/", (req, res) => {
-  res.send("Welcome to the system!");
-});
+  // Error handler must be defined last
+  app.use(errorHandler);
 
-// Error handler must be defined last
-app.use(errorHandler);
-
-
-return app;
+  return app;
 }

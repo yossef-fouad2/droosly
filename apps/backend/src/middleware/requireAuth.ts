@@ -6,7 +6,7 @@ declare global {
   namespace Express {
     interface Request {
       userId?: number;
-      workpsaceId?: number;
+      workspaceId?: number;
     }
   }
 }
@@ -16,7 +16,10 @@ const requireAuth = (req: Request, _res: Response, next: NextFunction) => {
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return next(
-      new AppError("UNAUTHENTICATED", "Missing or malformed Authorization header"),
+      new AppError(
+        "UNAUTHENTICATED",
+        "Missing or malformed Authorization header",
+      ),
     );
   }
   try {

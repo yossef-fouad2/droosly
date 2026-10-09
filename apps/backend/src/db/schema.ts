@@ -33,22 +33,24 @@ export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  categoryId: integer("category_id").references(() => categories.id).notNull(),
+  categoryId: integer("category_id")
+    .references(() => categories.id)
+    .notNull(),
   price: integer("price").notNull(),
   workspaceId: integer("workspace_id")
-  .references(() => workspaces.id)
-  .notNull(),
-  deletedAt: timestamp("deleted_at").defaultNow().notNull(),
+    .references(() => workspaces.id)
+    .notNull(),
+  deletedAt: timestamp("deleted_at").notNull(),
 });
 
-export const categories = pgTable("categories",{
+export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
   nameEn: text("name_en").notNull(),
   nameAr: text("name_ar").notNull(),
   slug: text("slug").notNull().unique(),
 });
 
-export const gradeLevels = pgTable("grade_levels",{
+export const gradeLevels = pgTable("grade_levels", {
   id: serial("id").primaryKey(),
   nameEn: text("name_en").notNull(),
   nameAr: text("name_ar").notNull(),
@@ -56,15 +58,13 @@ export const gradeLevels = pgTable("grade_levels",{
   order: integer("sort_order").notNull(),
 });
 
-export const terms = pgTable("terms",{
+export const terms = pgTable("terms", {
   id: serial().primaryKey(),
   nameEn: text("name_en").notNull(),
   nameAr: text("name_ar").notNull(),
   slug: text("slug").notNull().unique(),
   order: integer("sort_order").notNull(),
 });
-
-
 
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
@@ -103,13 +103,13 @@ export const enrollments = pgTable(
     validUntil: timestamp("valid_until").notNull(),
     status: text("status").notNull(),
   },
-  (table) => ([
-     unique("userCourseTermUnique").on(
+  (table) => [
+    unique("userCourseTermUnique").on(
       table.userId,
       table.courseId,
-      table.termId
+      table.termId,
     ),
-  ]),
+  ],
 );
 
 export const watchProgress = pgTable(
@@ -128,21 +128,18 @@ export const watchProgress = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.lessonId] })],
 );
 
-export const devices = pgTable("devices", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .references(() => users.id)
-    .notNull(),
-  deviceId: text("device_id").notNull(),
-  deviceType: text("device_type").notNull(),
-  lastUsedAt: timestamp("last_used_at").defaultNow().notNull(),
-},
-   (table) => ([
-     unique("user_device_unique").on(
-      table.userId,
-      table.deviceId,
-    ),
-  ]),
+export const devices = pgTable(
+  "devices",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .references(() => users.id)
+      .notNull(),
+    deviceId: text("device_id").notNull(),
+    deviceType: text("device_type").notNull(),
+    lastUsedAt: timestamp("last_used_at").defaultNow().notNull(),
+  },
+  (table) => [unique("user_device_unique").on(table.userId, table.deviceId)],
 );
 
 export type User = typeof users.$inferSelect;
