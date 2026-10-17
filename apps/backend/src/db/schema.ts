@@ -1,5 +1,7 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   doublePrecision,
   integer,
   pgTable,
@@ -40,7 +42,7 @@ export const courses = pgTable("courses", {
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id)
     .notNull(),
-  deletedAt: timestamp("deleted_at").notNull(),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const categories = pgTable("categories", {
@@ -56,6 +58,8 @@ export const gradeLevels = pgTable("grade_levels", {
   nameAr: text("name_ar").notNull(),
   slug: text("slug").notNull().unique(),
   order: integer("sort_order").notNull(),
+  startsAt: timestamp("starts_at", { mode: "string" }).notNull(), // or timestamptz
+  endsAt: timestamp("ends_at", { mode: "string" }).notNull(), // endsAt > startsAt
 });
 
 export const terms = pgTable("terms", {
@@ -64,6 +68,8 @@ export const terms = pgTable("terms", {
   nameAr: text("name_ar").notNull(),
   slug: text("slug").notNull().unique(),
   order: integer("sort_order").notNull(),
+  startsAt: timestamp("starts_at", { mode: "string" }).notNull(), // or timestamptz
+  endsAt: timestamp("ends_at", { mode: "string" }).notNull(), // endsAt > startsAt
 });
 
 export const lessons = pgTable("lessons", {
@@ -109,6 +115,33 @@ export const enrollments = pgTable(
       table.courseId,
       table.termId,
     ),
+  ],
+);
+
+export const packages = pgTable(
+  "packages",
+  {
+    id: serial("id").primaryKey(),
+    courseId: integer("course_id")
+      .references(() => courses.id)
+      .notNull(),
+    termId: integer("term_id")
+      .references(() => terms.id)
+      .notNull(),
+    title: text("title").notNull(),
+    orderIndex: integer("order_index").notNull(),
+    priceMinor: integer("price_minor").notNull(),
+    publishedAt: timestamp("published_at"),
+    archivedAt: timestamp("archived_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("packagesCourseTermOrderUnique").on(
+      table.courseId,
+      table.termId,
+      table.orderIndex,
+    ),
+    check("packagesPriceMinorPositive", sql`price_minor > 0`),
   ],
 );
 
@@ -162,3 +195,5 @@ export type GradeLevel = typeof gradeLevels.$inferSelect;
 export type NewGradeLevel = typeof gradeLevels.$inferInsert;
 export type Term = typeof terms.$inferSelect;
 export type NewTerm = typeof terms.$inferInsert;
+export type Package = typeof packages.$inferSelect;
+export type NewPackage = typeof packages.$inferInsert;
