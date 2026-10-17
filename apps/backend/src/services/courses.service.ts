@@ -14,7 +14,6 @@ const courseColumns = {
   title: courses.title,
   description: courses.description,
   categoryId: courses.categoryId,
-  price: courses.price,
   workspaceId: courses.workspaceId,
 };
 
@@ -84,7 +83,6 @@ export async function createCourse(
     title: input.title,
     description: input.description,
     categoryId: input.categoryId,
-    price: input.price,
     workspaceId,
   };
 

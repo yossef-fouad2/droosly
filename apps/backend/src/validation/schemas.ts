@@ -29,8 +29,7 @@ export const createCourseSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(200),
   description: z.string().trim().min(1, "Description is required"),
   categoryId: z.coerce.number().int().positive(),
-  price: z.coerce.number().int().nonnegative("Price must be non-negative"),
-  // instructorId intentionally omitted — derived from the authenticated user
+  // price intentionally omitted — packages own priceMinor
 });
 
 export const updateCourseSchema = createCourseSchema.partial();

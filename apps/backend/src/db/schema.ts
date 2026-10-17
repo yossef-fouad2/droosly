@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
-  doublePrecision,
   integer,
   pgTable,
   primaryKey,
@@ -38,7 +37,6 @@ export const courses = pgTable("courses", {
   categoryId: integer("category_id")
     .references(() => categories.id)
     .notNull(),
-  price: integer("price").notNull(),
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id)
     .notNull(),
@@ -68,22 +66,29 @@ export const terms = pgTable("terms", {
   nameAr: text("name_ar").notNull(),
   slug: text("slug").notNull().unique(),
   order: integer("sort_order").notNull(),
-  startsAt: timestamp("starts_at", { mode: "string" }).notNull(), // or timestamptz
-  endsAt: timestamp("ends_at", { mode: "string" }).notNull(), // endsAt > startsAt
+  startsAt: timestamp("starts_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+  endsAt: timestamp("ends_at", { withTimezone: true, mode: "date" }).notNull(),
 });
 
-export const lessons = pgTable("lessons", {
-  id: serial("id").primaryKey(),
-  courseId: integer("course_id")
-    .references(() => courses.id)
-    .notNull(),
-  title: text("title").notNull(),
-  duration: integer("duration").notNull(),
-  videoId: integer("video_id")
-    .references(() => videos.id)
-    .notNull(),
-  orderIndex: integer("order_index").notNull(),
-});
+export const lessons = pgTable(
+  "lessons",
+  {
+    id: serial("id").primaryKey(),
+    packageId: integer("package_id")
+      .references(() => packages.id)
+      .notNull(),
+    title: text("title").notNull(),
+    duration: integer("duration").notNull().default(0),
+    videoId: integer("video_id").references(() => videos.id),
+    orderIndex: integer("order_index").notNull(),
+  },
+  (table) => [
+    unique("lessonsPackageOrderUnique").on(table.packageId, table.orderIndex),
+  ],
+);
 
 export const videos = pgTable("videos", {
   id: serial("id").primaryKey(),
@@ -100,21 +105,16 @@ export const enrollments = pgTable(
     userId: integer("user_id")
       .references(() => users.id)
       .notNull(),
-    courseId: integer("course_id")
-      .references(() => courses.id)
+    packageId: integer("package_id")
+      .references(() => packages.id)
       .notNull(),
     enrolledAt: timestamp("enrolled_at").defaultNow().notNull(),
-    termId: integer("term_id").notNull(),
     validFrom: timestamp("valid_from").notNull(),
     validUntil: timestamp("valid_until").notNull(),
     status: text("status").notNull(),
   },
   (table) => [
-    unique("userCourseTermUnique").on(
-      table.userId,
-      table.courseId,
-      table.termId,
-    ),
+    unique("userPackageUnique").on(table.userId, table.packageId),
   ],
 );
 
